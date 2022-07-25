@@ -7,16 +7,37 @@ terraform {
     region         = "us-east-1"
     dynamodb_table = "terraform-state-locking"
     encrypt        = true
-    }
+  }
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 3.0"
-        }
     }
+  }
 }
 
 provider "aws" {
   region = "us-east-1"
+}
+
+variable "db_pass" {
+  description = "password for database #1"
+  type        = string
+  sensitive   = true
+}
+
+module "web_app" {
+  source = "../module"
+
+  # Input Variables
+  bucket_name      = "web-app-1-devops-directive-web-app-data"
+  domain           = "devopsdeployed.com"
+  app_name         = "web-app"
+  environment_name = "development"
+  instance_type    = "t2.small"
+  create_dns_zone  = true
+  db_name          = "webappdb"
+  db_user          = "foo"
+  db_pass          = var.db_pass
 }
